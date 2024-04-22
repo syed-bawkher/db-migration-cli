@@ -49,8 +49,21 @@ customer_df = deduped_df[customer_columns]
 # Ensure 'onote' field is clean
 df['onote'] = df['onote'].astype(str).replace('\n', ' ', regex=True)
 
+# Group by 'orderNo' and apply the custom aggregation function
+grouped_orders = df.groupby('orderNo').apply(aggregate_rows).reset_index(drop=True)
+
+# Ensure 'customer_id' is unique within each group
+grouped_orders['customer_id'] = grouped_orders['customer_id'].astype('Int64')
+
+# Sort by 'orderNo' and 'date' in descending order to make the latest entries come first
+grouped_orders.sort_values(by=['orderNo', 'date'], ascending=[True, False], inplace=True)
+
+# Deduplicate by keeping only the first occurrence of each 'orderNo'
+grouped_orders.drop_duplicates(subset='orderNo', keep='first', inplace=True)
+
 # Prepare the order DataFrame
-order_df = df[['orderNo', 'customer_id', 'date', 'onote']]
+order_df = grouped_orders[['orderNo', 'customer_id', 'date', 'onote']]
+
 
 
 # Define measurement columns
