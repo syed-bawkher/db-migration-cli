@@ -7,22 +7,22 @@ df = pd.read_csv('Database.csv', low_memory=False)
 # Clean 'orderno'
 df['orderNo'] = df['orderno'].astype(str).str.strip()
 
-# Function to clean phone numbers by removing non-digit characters
+# Function to clean phone numbers by removing non-digit characters for consolidation
 def clean_phone(phone):
     return re.sub(r"[^\d]", "", str(phone)) if pd.notna(phone) else ""
 
-# Apply phone number cleaning
-df['mobile'] = df['mobile'].apply(clean_phone)
-df['phoff'] = df['phoff'].apply(clean_phone)
-df['phres'] = df['phres'].apply(clean_phone)
+# Create new columns for cleaned phone numbers
+df['clean_mobile'] = df['mobile'].apply(clean_phone)
+df['clean_phoff'] = df['phoff'].apply(clean_phone)
+df['clean_phres'] = df['phres'].apply(clean_phone)
 
-# Combine phone numbers into one field, prioritizing mobile, then office, then residential
-df['phone'] = df[['mobile', 'phoff', 'phres']].bfill(axis=1).iloc[:, 0].fillna('')
+# Combine cleaned phone numbers into one field, prioritizing mobile, then office, then residential
+df['combined_phone'] = df[['clean_mobile', 'clean_phoff', 'clean_phres']].bfill(axis=1).iloc[:, 0].fillna('')
 
-# Create a unique fallback identifier based on other customer details if phone is empty
-df['fallback_id'] = df.apply(lambda x: f"{x['name']}-{x['mname']}-{x['lname']}-{x['email']}-{x.index}" if x['phone'] == '' else x['phone'], axis=1)
+# Create a unique fallback identifier based on other customer details if combined_phone is empty
+df['fallback_id'] = df.apply(lambda x: f"{x['name']}-{x['mname']}-{x['lname']}-{x['email']}-{x.index}" if x['combined_phone'] == '' else x['combined_phone'], axis=1)
 
-# Use either phone or fallback ID as the unique identifier
+# Use either combined phone or fallback ID as the unique identifier
 df['unique_id'] = df['fallback_id']
 
 # Convert date to datetime format for consistency
@@ -39,7 +39,7 @@ aggregated_data = df.groupby('unique_id').first().reset_index()
 
 # Prepare customer DataFrame
 customer_columns = [
-    'customer_id', 'name', 'mname', 'lname', 'add1', 'add2', 'add3', 'add4', 'email', 'phone', 'date'
+    'customer_id', 'name', 'mname', 'lname', 'add1', 'add2', 'add3', 'add4', 'email', 'mobile', 'phoff', 'phres', 'date'
 ]
 customers_final = aggregated_data[customer_columns]
 

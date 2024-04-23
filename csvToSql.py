@@ -30,7 +30,9 @@ customers = Table('Customer', metadata,
                   Column('add3', String(255)),
                   Column('add4', String(255)),
                   Column('email', String(255)),
-                  Column('phone', String(255)),
+                  Column('mobile', String(255)),
+                  Column('office_phone', String(255)),
+                  Column('resedential_phone', String(255)),
                   Column('last_ordered_date', Date))
 
 orders = Table('Orders', metadata,
@@ -82,7 +84,7 @@ metadata.create_all(engine)
 
 # Load data from CSV files
 df_customers = pd.read_csv('./consolidated-data/ConsolidatedCustomers.csv')
-df_customers.rename(columns={'new_customer_id': 'customer_id', 'name':'first_name', 'mname':'middle_name', 'lname':'last_name', 'date':'last_ordered_date'}, inplace=True)  # Rename column
+df_customers.rename(columns={'new_customer_id': 'customer_id', 'name':'first_name', 'mname':'middle_name', 'lname':'last_name', 'date':'last_ordered_date', 'phoff':'office_phone', 'phres':'resedential_phone'}, inplace=True)  # Rename column
 
 df_jackets = pd.read_csv('./consolidated-data/JacketMeasurement.csv')
 df_jackets.rename(columns={'jl': 'jacket_length', 'jnl': 'natural_length', 'jbl': 'back_length', 'jxback': 'x_back', 'jtsleeve': 'to_sleeve', 'jchest': 'chest', 'jhs':'half_shoulder', 'jwaist': 'waist', 'scollar': 'collar', 'jothers': 'other_notes'}, inplace=True)  # Rename columns
