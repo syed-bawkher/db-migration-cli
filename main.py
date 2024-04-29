@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+from uuid import uuid4
 
 # Load the dataset
 df = pd.read_csv('Database.csv', low_memory=False)
@@ -51,13 +52,14 @@ order_df = df[['orderNo', 'customer_id', 'date', 'onote']].drop_duplicates(subse
 
 # Define measurement columns and prepare measurement tables
 measure_columns = {
-    'JacketMeasurement.csv': ['customer_id', 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'],
-    'ShirtMeasurement.csv': ['customer_id', 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'],
-    'PantMeasurement.csv': ['customer_id', 'plength', 'pinseem', 'pwaist', 'phips', 'pbottom', 'pknee', 'pothers']
+    'JacketMeasurement.csv': ['customer_id','date', 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'],
+    'ShirtMeasurement.csv': ['customer_id','date', 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'],
+    'PantMeasurement.csv': ['customer_id','date', 'plength', 'pinseem', 'pwaist', 'phips', 'pbottom', 'pknee', 'pothers']
 }
 
 for file, columns in measure_columns.items():
     measurements = df[columns].dropna(subset=['customer_id'])  # Assume measurements are only taken when customer_id is available
+    measurements['measurement_id'] = [f"{uuid4()}" for _ in range(len(measurements))]  # Generating unique IDs
     measurements.to_csv(f'./consolidated-data/{file}', index=False)
 
 # Save DataFrames

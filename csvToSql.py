@@ -1,4 +1,3 @@
-#Transfer all the csv tables from the consolidated-data folder to a SQLite database.
 import pandas as pd
 from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData, ForeignKey, Date, Text
 from dotenv import load_dotenv
@@ -10,8 +9,8 @@ load_dotenv() # Load environment variables
 username = os.getenv('SB_DB_USERNAME')
 password = os.getenv('SB_DB_PASSWORD')
 database = os.getenv('SB_DB_DATABASE')
-host = os.getenv('SB_DB_HOST')  # localhost
-port = os.getenv('SB_DB_PORT')       # default MySQL port
+host = os.getenv('SB_DB_HOST')
+port = os.getenv('SB_DB_PORT')
 
 # Establish a connection to the database
 engine = create_engine(f'mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database}')
@@ -32,7 +31,7 @@ customers = Table('Customer', metadata,
                   Column('email', String(255)),
                   Column('mobile', String(255)),
                   Column('office_phone', String(255)),
-                  Column('resedential_phone', String(255)),
+                  Column('residential_phone', String(255)),
                   Column('last_ordered_date', Date))
 
 orders = Table('Orders', metadata,
@@ -42,8 +41,9 @@ orders = Table('Orders', metadata,
                Column('onote', Text))
 
 jacket_measurements = Table('JacketMeasurement', metadata,
-                            Column('id', Integer, primary_key=True, autoincrement=True),
+                            Column('measurement_id', String(255), primary_key=True),
                             Column('customer_id', None, ForeignKey('Customer.customer_id')),
+                            Column('date', Date),
                             Column('jacket_length', String(255)),
                             Column('natural_length', String(255)),
                             Column('back_length', String(255)),
@@ -56,8 +56,9 @@ jacket_measurements = Table('JacketMeasurement', metadata,
                             Column('other_notes', Text))
 
 shirt_measurements = Table('ShirtMeasurement', metadata,
-                           Column('id', Integer, primary_key=True, autoincrement=True),
+                           Column('measurement_id', String(255), primary_key=True),
                            Column('customer_id', None, ForeignKey('Customer.customer_id')),
+                           Column('date', Date),
                            Column('length', String(255)),
                            Column('half_shoulder', String(255)),
                            Column('to_sleeve', String(255)),
@@ -69,8 +70,9 @@ shirt_measurements = Table('ShirtMeasurement', metadata,
                            Column('other_notes', Text))
 
 pant_measurements = Table('PantMeasurement', metadata,
-                          Column('id', Integer, primary_key=True, autoincrement=True),
+                          Column('measurement_id', String(255), primary_key=True),
                           Column('customer_id', None, ForeignKey('Customer.customer_id')),
+                          Column('date', Date),
                           Column('length', String(255)),
                           Column('inseem', String(255)),
                           Column('waist', String(255)),
@@ -81,25 +83,75 @@ pant_measurements = Table('PantMeasurement', metadata,
 
 # Create the tables in the database
 metadata.create_all(engine)
-
-# Load data from CSV files
+# Load data from CSV files and rename columns to match the SQL table structure
 df_customers = pd.read_csv('./consolidated-data/ConsolidatedCustomers.csv')
-df_customers.rename(columns={'new_customer_id': 'customer_id', 'name':'first_name', 'mname':'middle_name', 'lname':'last_name', 'date':'last_ordered_date', 'phoff':'office_phone', 'phres':'resedential_phone'}, inplace=True)  # Rename column
+df_customers.rename(columns={
+    'name': 'first_name',
+    'mname': 'middle_name',
+    'lname': 'last_name',
+    'phoff': 'office_phone',
+    'phres': 'residential_phone',
+    'date': 'last_ordered_date'  # Ensure this matches the CSV structure; if 'date' isn't present, adjust accordingly
+}, inplace=True)
 
 df_jackets = pd.read_csv('./consolidated-data/JacketMeasurement.csv')
-df_jackets.rename(columns={'jl': 'jacket_length', 'jnl': 'natural_length', 'jbl': 'back_length', 'jxback': 'x_back', 'jtsleeve': 'to_sleeve', 'jchest': 'chest', 'jhs':'half_shoulder', 'jwaist': 'waist', 'scollar': 'collar', 'jothers': 'other_notes'}, inplace=True)  # Rename columns
+df_jackets.rename(columns={
+    'jl': 'jacket_length',
+    'jnl': 'natural_length',
+    'jbl': 'back_length',
+    'jxback': 'x_back',
+    'jtsleeve': 'to_sleeve',
+    'jchest': 'chest',
+    'jhs': 'half_shoulder',
+    'jwaist': 'waist',
+    'scollar': 'collar',
+    'jothers': 'other_notes',
+    'measurement_id': 'measurement_id',  # Assuming this already matches
+    'date': 'date'
+}, inplace=True)
 
 df_pants = pd.read_csv('./consolidated-data/PantMeasurement.csv')
-df_pants.rename(columns={'plength': 'length', 'pinseem': 'inseem', 'pwaist': 'waist', 'phips': 'hips', 'pbottom': 'bottom', 'pknee': 'knee', 'pothers': 'other_notes'}, inplace=True)  # Rename columns
+df_pants.rename(columns={
+    'plength': 'length',
+    'pinseem': 'inseem',
+    'pwaist': 'waist',
+    'phips': 'hips',
+    'pbottom': 'bottom',
+    'pknee': 'knee',
+    'pothers': 'other_notes',
+    'measurement_id': 'measurement_id',
+    'date': 'date'
+}, inplace=True)
 
 df_shirts = pd.read_csv('./consolidated-data/ShirtMeasurement.csv')
-df_shirts.rename(columns={'slength': 'length', 'sshool': 'half_shoulder', 'stosleeve': 'to_sleeve', 'schest': 'chest', 'swaist': 'waist', 'scollar': 'collar', 'sothers': 'other_notes', 'vcoatlen': 'waist_coat_length', 'sherlen': 'sherwani_length'}, inplace=True)  # Rename columns
+df_shirts.rename(columns={
+    'slength': 'length',
+    'sshool': 'half_shoulder',
+    'stosleeve': 'to_sleeve',
+    'schest': 'chest',
+    'swaist': 'waist',
+    'scollar': 'collar',
+    'sothers': 'other_notes',
+    'vcoatlen': 'waist_coat_length',
+    'sherlen': 'sherwani_length',
+    'measurement_id': 'measurement_id',
+    'date': 'date'
+}, inplace=True)
 
 df_orders = pd.read_csv('./consolidated-data/UpdatedOrders.csv')
+df_orders.rename(columns={
+    'orderNo': 'orderNo',  # Assuming this already matches
+    'customer_id': 'customer_id',
+    'date': 'date',
+    'onote': 'onote'
+}, inplace=True)
 
-# Insert data into the database
-df_customers.to_sql('Customer', con=engine, if_exists='append', index=False)
-df_orders.to_sql('Orders', con=engine, if_exists='append', index=False)
-df_jackets.to_sql('JacketMeasurement', con=engine, if_exists='append', index=False)
-df_shirts.to_sql('ShirtMeasurement', con=engine, if_exists='append', index=False)
-df_pants.to_sql('PantMeasurement', con=engine, if_exists='append', index=False)
+# Function to load data and insert into database
+def load_and_insert(df, table):
+    df.to_sql(table.name, con=engine, if_exists='append', index=False)
+
+load_and_insert(df_customers, customers)
+load_and_insert(df_orders, orders)
+load_and_insert(df_jackets, jacket_measurements)
+load_and_insert(df_shirts, shirt_measurements)
+load_and_insert(df_pants, pant_measurements)
