@@ -52,9 +52,9 @@ order_df = df[['orderNo', 'customer_id', 'date', 'onote']].drop_duplicates(subse
 
 # Define measurement columns and prepare measurement tables
 measure_columns = {
-    'JacketMeasurement.csv': ['customer_id','date', 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'],
-    'ShirtMeasurement.csv': ['customer_id','date', 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'],
-    'PantMeasurement.csv': ['customer_id','date', 'plength', 'pinseem', 'pwaist', 'phips', 'pbottom', 'pknee', 'pothers']
+    'JacketMeasurement.csv': ['customer_id','date','orderNo' , 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'],
+    'ShirtMeasurement.csv': ['customer_id','date','orderNo' , 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'],
+    'PantMeasurement.csv': ['customer_id','date','orderNo' , 'plength', 'pinseem', 'pwaist', 'phips', 'pbottom', 'pknee', 'pothers']
 }
 
 for file, columns in measure_columns.items():
