@@ -54,6 +54,8 @@ jacket_measurements = Table('JacketMeasurement', metadata,
                             Column('chest', String(255)),
                             Column('waist', String(255)),
                             Column('collar', String(255)),
+                            Column('waist_coat_length', String(255)),
+                            Column('sherwani_length', String(255)),
                             Column('other_notes', Text))
 
 shirt_measurements = Table('ShirtMeasurement', metadata,
@@ -67,8 +69,6 @@ shirt_measurements = Table('ShirtMeasurement', metadata,
                            Column('chest', String(255)),
                            Column('waist', String(255)),
                            Column('collar', String(255)),
-                           Column('waist_coat_length', String(255)),
-                           Column('sherwani_length', String(255)),
                            Column('other_notes', Text))
 
 pant_measurements = Table('PantMeasurement', metadata,
@@ -108,6 +108,8 @@ df_jackets.rename(columns={
     'jhs': 'half_shoulder',
     'jwaist': 'waist',
     'scollar': 'collar',
+    'vcoatlen': 'waist_coat_length',
+    'sherlen': 'sherwani_length',
     'jothers': 'other_notes',
     'measurement_id': 'measurement_id',  # Assuming this already matches
     'date': 'date'
@@ -135,8 +137,6 @@ df_shirts.rename(columns={
     'swaist': 'waist',
     'scollar': 'collar',
     'sothers': 'other_notes',
-    'vcoatlen': 'waist_coat_length',
-    'sherlen': 'sherwani_length',
     'measurement_id': 'measurement_id',
     'date': 'date'
 }, inplace=True)

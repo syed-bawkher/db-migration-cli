@@ -50,28 +50,16 @@ df['onote'] = df['onote'].astype(str).replace('\n', ' ', regex=True)
 # Prepare the order DataFrame
 order_df = df[['orderNo', 'customer_id', 'date', 'onote']].drop_duplicates(subset='orderNo', keep='first')
 
-# Define measurement columns and prepare measurement tables
-#measure_columns = {
-#    'JacketMeasurement.csv': ['customer_id','date','orderNo' , 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'],
-#    'ShirtMeasurement.csv': ['customer_id','date','orderNo' , 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'],
-#    'PantMeasurement.csv': ['customer_id','date','orderNo' , 'plength', 'pinseem', 'pwaist', 'phips', 'pbottom', 'pknee', 'pothers']
-#}
-#
-#for file, columns in measure_columns.items():
-#    measurements = df[columns].dropna(subset=['customer_id'])  # Assume measurements are only taken when customer_id is available
-#    measurements['measurement_id'] = [f"{uuid4()}" for _ in range(len(measurements))]  # Generating unique IDs
-#    measurements.to_csv(f'./consolidated-data/{file}', index=False)
-
 #Jacket Measurement
-jacketMeasurement = df[['customer_id','date','orderNo' , 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers']].dropna(subset=['customer_id'])
+jacketMeasurement = df[['customer_id','date','orderNo' , 'jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar','vcoatlen', 'sherlen', 'jothers']].dropna(subset=['customer_id'])
 # Drop rows with missing values in measurement columns
-jacketMeasurement = jacketMeasurement.dropna(subset=['jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar', 'jothers'], how='all')
+jacketMeasurement = jacketMeasurement.dropna(subset=['jl', 'jnl', 'jbl', 'jxback', 'jtsleeve', 'jhs', 'jchest', 'jwaist', 'scollar','vcoatlen', 'sherlen', 'jothers'], how='all')
 jacketMeasurement['measurement_id'] = [f"{uuid4()}" for _ in range(len(jacketMeasurement))]  # Generating unique IDs
 
 #Shirt Measurement
-shirtMeasurement = df[['customer_id','date','orderNo' , 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers']].dropna(subset=['customer_id'])
+shirtMeasurement = df[['customer_id','date','orderNo' , 'slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'sothers']].dropna(subset=['customer_id'])
 # Drop rows with missing values in measurement columns
-shirtMeasurement = shirtMeasurement.dropna(subset=['slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'vcoatlen', 'sherlen', 'sothers'], how='all')
+shirtMeasurement = shirtMeasurement.dropna(subset=['slength', 'sshool', 'stosleeve', 'schest', 'swaist', 'scollar', 'sothers'], how='all')
 shirtMeasurement['measurement_id'] = [f"{uuid4()}" for _ in range(len(shirtMeasurement))]  # Generating unique IDs
 
 #Pant Measurement
